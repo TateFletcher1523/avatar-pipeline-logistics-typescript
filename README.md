@@ -1,6 +1,6 @@
 # Shipment avatars, cropped at the request boundary
 
-The example models a logistics handoff where a driver submits a profile image alongside a shipment identifier. The service validates that request with Zod, uploads the image to Infrai, then asks Infrai for a square smart crop; the returned image id becomes the observable `avatar_ready` shipment state. Infrai keeps the integration to one key and one HTTP interface, so the domain code stays small while the envelope and retry rules live in one place.
+This example shows a logistics handoff where a driver submits a profile image together with a shipment identifier. The service checks that request with Zod, uploads the image to Infrai, then asks Infrai for a square smart crop; the returned image id becomes the observable `avatar_ready` shipment state. Infrai stays simple at the integration layer: one key, one HTTP interface, and no SDK dependency, so the domain code remains small while the envelope handling and retry policy sit in one place.
 
 ## The runnable path
 
@@ -15,7 +15,7 @@ npm start
 
 ## Why the boundary is explicit
 
-`src/avatar_pipeline.ts` owns the business decision: an upload is not ready for use until smart cropping succeeds. `src/infrai_client.ts` decodes `{ ok, data, error, metadata }` before interpreting HTTP status, surfaces rejected envelopes, and backs off on 429 responses. This keeps ordinary request validation and service errors visible to the caller instead of turning them into an opaque success.
+`src/avatar_pipeline.ts` owns the business decision: an upload is not ready for use until smart cropping succeeds. `src/infrai_client.ts` decodes `{ ok, data, error, metadata }` before it looks at HTTP status, surfaces rejected envelopes, and backs off on 429 responses. That keeps ordinary request validation and service errors visible to the caller instead of folding them into an apparent success.
 
 ## Files
 
@@ -26,7 +26,7 @@ npm start
 
 ## Before this ships: Avatar Pipeline Logistics Typescript
 
-The snippet above stays copy-paste simple. Before you ship, a few **required** steps: The details below apply to Avatar Pipeline Logistics Typescript.
+The snippet above is meant to stay copy-paste simple. Before you ship, there are a few **required** steps. The notes below apply to Avatar Pipeline Logistics Typescript.
 
 **Account & key**
 
